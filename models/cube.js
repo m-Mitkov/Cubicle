@@ -1,35 +1,36 @@
-const fs = require('fs/promises');
-const path = require('path');
+const mongoose = require('mongoose');
 
-const db = require('../config/productsDb.json');
+const cubeSchema = new mongoose.Schema({
+    id: ObjectId,
 
+    name: {
+        type: String,
+        required: true
+    },
 
-class Cube {
-
-    constructor(id, name, desription, imageURL, difficulty){
-        this.id = id;
-        this.name = name;
-        this.desription = desription;
-        this.imageURL = imageURL;
-        this.difficulty = difficulty;
-    }
-
-    getByID(id){
-        return db.find(x => this.id === id);
-    }
+    description: {
+        type: String,
+        required: true,
+        maxlength: 50
+    },
     
-    getAll(){
-        return db;
-    }
+    imageUrl: {
+        type: String,
+        required: true,
+        validate: /^https?/
+    },
 
-    create(cube){
-        db.push(cube);
-        
-        return fs.writeFile(
-            path.join(__dirname, '../config/productsDb.json'), //  ABSOLUTE PATH
-            JSON.stringify(db), // DATA
-        )
-    }
-}
+    difficultyLevel: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 6
+    },
+    
+    accesories: [{
+        type: mongoose.Types.ObjectId,
+        ref: 'Accesory'
+    }],
+});
 
-module.exports = Cube;
+module.exports = mongoose.model('Cube', cubeSchema);
